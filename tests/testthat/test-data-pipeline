@@ -1,0 +1,11 @@
+library(testthat)
+
+
+test_that("load_workforce_data(path) returns a data.frame with 22 columns and > 1 row", {
+  path <- here::here("data", "23621-0008_de_flat.csv")
+  df <- load_workforce_data(path)
+
+  expect_true(is.data.frame(df))
+  expect_equal(ncol(df), 22)
+  expect_gt(nrow(df), 1)
+})
