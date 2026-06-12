@@ -1,11 +1,17 @@
+# This file contains tests for the data pipeline functions in R.
 library(testthat)
 
-
+# Test for data pipeline functions in R
 test_that("load_workforce_data(path) returns a data.frame with 22 columns and > 1 row", {
+  # Note: The path to the CSV file should be adjusted based on your project structure.
   path <- here::here("data", "23621-0008_de_flat.csv")
+  # Load the data using the function being tested
   df <- load_workforce_data(path)
 
+  # Perform assertions to check the structure of the returned data frame
   expect_true(is.data.frame(df))
+  # Check that the data frame has 22 columns
   expect_equal(ncol(df), 22)
+  # Check that the data frame has more than 1 row
   expect_gt(nrow(df), 1)
 })
