@@ -22,4 +22,5 @@ dependencies = [
     "ggplot2",
     "plotly",
     "DT",
+    "tidyselect",
 ]
