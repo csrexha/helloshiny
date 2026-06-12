@@ -1,0 +1,10 @@
+# This function loads workforce data from a specified path.
+load_workforce_data <- function(path) {   
+    data <- read_delim(path, 
+                       delim=";",
+                       locale=locale(encoding="UTF-8")
+                       )
+
+    return(data)
+}
+
