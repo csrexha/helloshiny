@@ -2,9 +2,8 @@
 library(testthat)
 
 # Test for data pipeline functions in R
-test_that("load_workforce_data(path) returns a data.frame with 22 columns and > 1 row", {
-  # Note: The path to the CSV file should be adjusted based on your project structure.
-  path <- here::here("data", "23621-0008_de_flat.csv")
+test_that("load_workforce_data(path) returns a data.frame with 22 columns and > 1 row", {  
+  path <- test_path("testdata", "23621-0008_de_flat.csv")
   # Load the data using the function being tested
   df <- load_workforce_data(path)
 
