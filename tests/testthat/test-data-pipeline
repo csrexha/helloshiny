@@ -2,7 +2,7 @@
 library(testthat)
 
 # Test for data pipeline functions in R
-test_that("load_workforce_data(path) returns a data.frame with 22 columns and > 1 row", {  
+test_that("load_workforce_data returns raw data frame", {  
   path <- test_path("testdata", "23621-0008_de_flat.csv")
   # Load the data using the function being tested
   df <- load_workforce_data(path)
