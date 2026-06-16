@@ -39,6 +39,7 @@ jobs:
         libcurl4-openssl-dev \
         libssl-dev \
         chromium-browser
+        
       - name: Install dependencies
         run: rv sync
 
