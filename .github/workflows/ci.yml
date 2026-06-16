@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.6'
+
+      - name: Cache rv library
+        uses: actions/cache@v4
+        with:
+          path: rv/library
+          key: rv-${{ hashFiles('rv.lock') }}
+          restore-keys: rv-
+
+      - name: Install rv
+        run: |
+          curl -fsSL https://get.rv.rs | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: rv restore
+
+      - name: Run tests
+        run: Rscript -e "testthat::test_dir('tests/testthat', reporter = 'progress')"
+        env:
+          R_LIBS_USER: ${{ github.workspace }}/rv/library
