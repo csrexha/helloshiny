@@ -26,11 +26,11 @@ jobs:
 
       - name: Install rv
         run: |
-          curl -fsSL https://get.rv.rs | sh
+          curl -sSL https://raw.githubusercontent.com/A2-ai/rv/refs/heads/main/scripts/install.sh | bash
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Install dependencies
-        run: rv restore
+        run: rv sync
 
       - name: Run tests
         run: Rscript -e "testthat::test_dir('tests/testthat', reporter = 'progress')"
