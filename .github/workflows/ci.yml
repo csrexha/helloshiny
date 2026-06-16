@@ -34,11 +34,11 @@ jobs:
 
       - name: Install system dependencies
         run: |
-        sudo apt-get update && sudo apt-get install -y \
-          libuv1-dev \
-          libcurl4-openssl-dev \
-          libssl-dev \
-          chromium-browser
+          sudo apt-get update && sudo apt-get install -y \
+            libuv1-dev \
+            libcurl4-openssl-dev \
+            libssl-dev \
+            chromium-browser
 
       - name: Install dependencies
         run: rv sync
