@@ -1,5 +1,8 @@
-# This function loads workforce data from a specified path.
-# (source: Destatis tabele 23621-0008, downloaded on 2026-06-12, see https://genesis.destatis.de/datenbank/online/table/23621-0008/table-toolbar)
+#' Loads workforce data
+#'
+#' @param path A string representing the file path to the workforce data CSV file.
+#' @return A data frame
+#' @export
 
 load_workforce_data <- function(path) {   
     data <- read_delim(path, 
