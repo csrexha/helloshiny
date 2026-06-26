@@ -14,7 +14,7 @@ test_that("Aggregate by year and profession", {
   expect_setequal(aggregated_df$profession_code, cleaned_df$profession_code)
 
   # use profession KB10-8135 in year 2013 as a test example
-  expect_match(aggregated_df$profession_code, "KB10-8135")
+  expect_contains(aggregated_df$profession_code, "KB10-8135")
   expect_contains(aggregated_df$year, 2013)
 
   expect_equal(
