@@ -7,7 +7,7 @@ test_that("Aggregate by year and profession", {
     clean_workforce_data() 
 
   # aggreate fte across age groups
-  aggregated_df <- aggregate_fte(clean_data)
+  aggregated_df <- aggregate_fte(cleaned_df)
 
   # test the data if it contains all years and profression after aggregation
   expect_setequal(aggregated_df$year, 2012:2024)
