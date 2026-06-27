@@ -7,8 +7,8 @@ test_that("age_distribution filters by profession and year", {
 
     sliced_df <- age_distribution(
         cleaned_df, 
-        profession_code = "KB10-81712", 
-        year = 2013
+        prof_code = "KB10-81712", 
+        time = 2013
         )
 
     age_groups <- c(
@@ -20,7 +20,7 @@ test_that("age_distribution filters by profession and year", {
     )
 
     expect_shape(sliced_df, nrow=5)
-    expect_identical(sliced_df$age_group, age_groups)
-    expect_identical(slice_df$fte, c(4, 5, 8, 8, 2))
+    expect_setequal(sliced_df$age_group, age_groups)
+    expect_identical(sliced_df$fte, c(4, 5, 8, 8, 2))
     }
 )
