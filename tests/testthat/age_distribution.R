@@ -6,7 +6,7 @@
 #' @return A aggregated data frame 
 #' @export
 
-age_distibution <- function(df, profession_code, year) {
+age_distribution <- function(df, profession_code, year) {
     age_groups <- c(
         "unter 30 Jahre",
         "30 bis unter 40 Jahre",
