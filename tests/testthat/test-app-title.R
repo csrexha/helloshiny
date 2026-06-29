@@ -1,4 +1,4 @@
-library(shiny)
+library(shinytest2)
 
 test_that("app launches and has correct title", {
     app_driver <- AppDriver$new(app_dir="../../app")
