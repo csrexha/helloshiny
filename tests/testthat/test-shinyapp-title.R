@@ -1,7 +1,8 @@
 library(shinytest2)
 
 test_that("app launches and has correct title", {
-    app_driver <- AppDriver$new(app_dir="../../app")
+    path <-  system.file("app", package="helloshiny")
+    app_driver <- AppDriver$new(app_dir = path)
 
     title <- app_driver$get_text("title")
     expect_equal(title, "Gesundheitspersonalrechnung")
