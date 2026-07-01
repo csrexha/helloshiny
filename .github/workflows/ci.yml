@@ -44,4 +44,6 @@ jobs:
         run: rv sync
 
       - name: Run tests
-        run: rv run -e "pkgload::load_all(); testthat::test_dir('tests', reporter = 'progress')"
+        run: rv run -e "pkgload::load_all(); shinytest2::test_app(reporter = 'progress')"
+        env:
+          NOT_CRAN: "true"
