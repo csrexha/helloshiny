@@ -5,7 +5,8 @@ test_that("test profession selector", {
         load_workforce_data() |>
         clean_workforce_data()
     
-    app_driver <- AppDriver$new(app_dir="../../app")
+    path <-  system.file("app", package="helloshiny")
+    app_driver <- AppDriver$new(app_dir = path)
 
     profession <- app_driver$get_values()$input$profession_select
 
