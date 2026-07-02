@@ -2,9 +2,12 @@
 % Please edit documentation in R/ui_elements.R
 \name{panelselectinput}
 \alias{panelselectinput}
+\alias{panelsliderinput}
 \title{UI element}
 \usage{
 panelselectinput()
+
+panelsliderinput()
 }
 \arguments{
 \item{...}{UI elements for the box}
