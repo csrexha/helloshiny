@@ -9,11 +9,12 @@ function(input, output, session) {
         clean_workforce_data()
 
     filtered_data <- reactive(
-        {
+        {   
+            req(input$year_range)
             cleaned_data |>
                 filter(between(year, input$year_range[1], input$year_range[2]))
         }
     )
-    
+
     exportTestValues(filtered_years = unique(filtered_data()$year))
 }
