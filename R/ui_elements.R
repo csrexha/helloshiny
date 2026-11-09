@@ -1,15 +1,12 @@
 #' UI element
 #'
-#' @param ... UI elements for the box
+#' @return A Shiny input tag for the sidebar
 #' @export
 #' @rdname uiElements
 
 panelselectinput <- function() {
 
-    cleaned_data <- load_workforce_data(
-        system.file("extdata", "23621-0008_de_flat.csv", package = "helloshiny")
-        ) |>
-        clean_workforce_data()
+    cleaned_data <- workforce_data()
 
     selectInput(
         "profession_select",
@@ -22,10 +19,7 @@ panelselectinput <- function() {
 #' @export
 #' @rdname uiElements
 panelsliderinput <- function() {
-    cleaned_data <- load_workforce_data(
-        system.file("extdata", "23621-0008_de_flat.csv", package = "helloshiny")
-        ) |>
-        clean_workforce_data()
+    cleaned_data <- workforce_data()
 
     year_min <- min(cleaned_data$year)
     year_max <- max(cleaned_data$year)
@@ -38,5 +32,18 @@ panelsliderinput <- function() {
         value = c(2013, 2023),
         step = 1,
         sep = ""
+        )
+}
+
+#' @export
+#' @rdname uiElements
+panelyearinput <- function() {
+    cleaned_data <- workforce_data()
+
+    selectInput(
+        "age_year",
+        "Year (age distribution)",
+        choices = sort(unique(cleaned_data$year), decreasing = TRUE),
+        selected = 2023
         )
 }

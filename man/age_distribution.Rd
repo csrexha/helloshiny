@@ -7,14 +7,14 @@
 age_distribution(data, prof_code, time)
 }
 \arguments{
-\item{data}{A data frame}
+\item{data}{A data frame, as returned by \code{\link[=clean_workforce_data]{clean_workforce_data()}}}
 
-\item{profession_code}{profession_code}
+\item{prof_code}{A profession code, e.g. \code{"KB10-81712"}}
 
-\item{year}{year}
+\item{time}{A year, e.g. \code{2013}}
 }
 \value{
-A sliced data frame
+A data frame with one row per age group, ordered from youngest to oldest
 }
 \description{
 Slice profession and year

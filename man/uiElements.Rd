@@ -3,14 +3,17 @@
 \name{panelselectinput}
 \alias{panelselectinput}
 \alias{panelsliderinput}
+\alias{panelyearinput}
 \title{UI element}
 \usage{
 panelselectinput()
 
 panelsliderinput()
+
+panelyearinput()
 }
-\arguments{
-\item{...}{UI elements for the box}
+\value{
+A Shiny input tag for the sidebar
 }
 \description{
 UI element
