@@ -7,8 +7,8 @@
 aggregate_fte <- function(data) {
     aggregated_data <- data |>
         filter(age_group != "Insgesamt") |>     # filter pre-calcuated sum
-        group_by(year, profession_code) |>
-        summarise(total_fte = sum(fte))
+        group_by(year, profession_code, profession_label) |>
+        summarise(total_fte = sum(fte), .groups = "drop")
 
     return(aggregated_data)
 }

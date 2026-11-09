@@ -1,5 +1,6 @@
 library(shiny)
 library(helloshiny)
+library(plotly)
 
 fluidPage(
     title="Gesundheitspersonalrechnung",
@@ -7,7 +8,8 @@ fluidPage(
     sidebarPanel(
         panelselectinput(),
         panelsliderinput()
-        )
+        ),
+    plotlyOutput("trend_chart")
 )
 
 

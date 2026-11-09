@@ -9,6 +9,9 @@ test_that("Aggregate by year and profession", {
   # aggreate fte across age groups
   aggregated_df <- aggregate_fte(cleaned_df)
 
+  # result must be ungrouped so downstream consumers (e.g. plot_ly) see one series
+  expect_false(dplyr::is_grouped_df(aggregated_df))
+
   # test the data if it contains all years and profression after aggregation
   expect_setequal(aggregated_df$year, 2012:2024)
   expect_setequal(aggregated_df$profession_code, cleaned_df$profession_code)

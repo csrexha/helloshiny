@@ -1,6 +1,7 @@
 library(shiny)
 library(helloshiny)
 library(dplyr)
+library(plotly)
 
 function(input, output, session) {
     cleaned_data <- load_workforce_data(
@@ -8,12 +9,39 @@ function(input, output, session) {
         ) |>
         clean_workforce_data()
 
+    aggregate_data <- aggregate_fte(cleaned_data)
+
     filtered_data <- reactive(
-        {
+        {   
+            req(input$year_range)
+
             cleaned_data |>
                 filter(between(year, input$year_range[1], input$year_range[2]))
         }
     )
-    
+
+    filtered_aggregate_fte <- reactive(
+        {   
+            req(input$year_range, input$profession_select)
+
+            aggregate_data |>
+                filter(between(year, input$year_range[1], input$year_range[2])) |>
+                filter(profession_label %in% input$profession_select)
+        }
+    )
+
     exportTestValues(filtered_years = unique(filtered_data()$year))
+
+    output$trend_chart <- renderPlotly(
+        {
+            plot_ly(
+                filtered_aggregate_fte(),
+                x = ~year,
+                y = ~total_fte,
+                name = ~profession_label,
+                type = "scatter",
+                mode = "lines+markers"
+            )
+        }
+    )
 }

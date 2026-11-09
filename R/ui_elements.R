@@ -14,7 +14,7 @@ panelselectinput <- function() {
     selectInput(
         "profession_select",
         "Profession",
-        choices = cleaned_data$profession_label,
+        choices = unique(cleaned_data$profession_label),
         selected = "Physiotherapie - Fachkraft"
         )
 }
@@ -33,9 +33,10 @@ panelsliderinput <- function() {
     sliderInput(
         "year_range",
         "Year",
-        min=year_min,
-        max=year_max,
-        value=c(year_min, year_max),
-        sep=""
+        min = year_min,
+        max = year_max,
+        value = c(2013, 2023),
+        step = 1,
+        sep = ""
         )
 }
