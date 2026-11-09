@@ -40,3 +40,19 @@ panelsliderinput <- function() {
         sep = ""
         )
 }
+
+#' @export
+#' @rdname uiElements
+panelyearinput <- function() {
+    cleaned_data <- load_workforce_data(
+        system.file("extdata", "23621-0008_de_flat.csv", package = "helloshiny")
+        ) |>
+        clean_workforce_data()
+
+    selectInput(
+        "age_year",
+        "Year (age distribution)",
+        choices = sort(unique(cleaned_data$year), decreasing = TRUE),
+        selected = 2023
+        )
+}

@@ -7,9 +7,11 @@ fluidPage(
     h1("Gesundheitspersonalrechnung"),
     sidebarPanel(
         panelselectinput(),
-        panelsliderinput()
+        panelsliderinput(),
+        panelyearinput()
         ),
-    plotlyOutput("trend_chart")
+    plotlyOutput("trend_chart"),
+    plotlyOutput("age_chart")
 )
 
 

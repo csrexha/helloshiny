@@ -30,6 +30,23 @@ function(input, output, session) {
         }
     )
 
+    selected_age_distribution <- reactive(
+        {
+            req(input$profession_select, input$age_year)
+
+            prof_code <- cleaned_data |>
+                filter(profession_label == input$profession_select) |>
+                pull(profession_code) |>
+                unique()
+
+            age_distribution(
+                cleaned_data,
+                prof_code = prof_code,
+                time = as.integer(input$age_year)
+            )
+        }
+    )
+
     exportTestValues(filtered_years = unique(filtered_data()$year))
 
     output$trend_chart <- renderPlotly(
@@ -41,6 +58,17 @@ function(input, output, session) {
                 name = ~profession_label,
                 type = "scatter",
                 mode = "lines+markers"
+            )
+        }
+    )
+
+    output$age_chart <- renderPlotly(
+        {
+            plot_ly(
+                selected_age_distribution(),
+                x = ~age_group,
+                y = ~fte,
+                type = "bar"
             )
         }
     )
