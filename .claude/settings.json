@@ -1,4 +1,9 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(git check-ignore *)"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {
