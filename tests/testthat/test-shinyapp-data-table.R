@@ -12,6 +12,21 @@ wait_for_drawn_table <- function(app_driver) {
     ")
 }
 
+# After an input change the old table is still on the page until DT redraws it, so
+# count DataTables draw events (they bubble up to the document) from here on.
+start_counting_draws <- function(app_driver) {
+    app_driver$run_js("
+        window.workforceTableDraws = 0;
+        $(document).off('draw.dt.count').on('draw.dt.count', '#workforce_table table', function() {
+            window.workforceTableDraws++;
+        });
+    ")
+}
+
+wait_for_redraw <- function(app_driver) {
+    app_driver$wait_for_js("window.workforceTableDraws > 0")
+}
+
 table_headers <- function(app_driver) {
     unlist(app_driver$get_js("
         $('#workforce_table table').DataTable().columns().header().toArray()
@@ -34,8 +49,9 @@ test_that("workforce table shows year, profession and FTE for the filtered years
     # 2013-2023 -> 11 rows, 2015-2020 -> 6 rows
     expect_equal(table_row_count(app_driver), 11)
 
+    start_counting_draws(app_driver)
     app_driver$set_inputs(year_range = c(2015, 2020))
-    wait_for_drawn_table(app_driver)
+    wait_for_redraw(app_driver)
     expect_equal(table_row_count(app_driver), 6)
     }
 )
