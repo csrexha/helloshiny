@@ -12,8 +12,8 @@ panelsliderinput()
 
 panelyearinput()
 }
-\arguments{
-\item{...}{UI elements for the box}
+\value{
+A Shiny input tag for the sidebar
 }
 \description{
 UI element

@@ -1,6 +1,6 @@
 #' UI element
 #'
-#' @param ... UI elements for the box
+#' @return A Shiny input tag for the sidebar
 #' @export
 #' @rdname uiElements
 
