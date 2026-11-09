@@ -1,9 +1,9 @@
 #' Slice profession and year
 #'
-#' @param data A data frame
-#' @param profession_code profession_code
-#' @param year year
-#' @return A sliced data frame 
+#' @param data A data frame, as returned by [clean_workforce_data()]
+#' @param prof_code A profession code, e.g. `"KB10-81712"`
+#' @param time A year, e.g. `2013`
+#' @return A data frame with one row per age group, ordered from youngest to oldest
 #' @export
 
 age_distribution <- function(data, prof_code, time) {
