@@ -1,20 +1,9 @@
 library(shinytest2)
 
-profession <- "Altenpflege (oS) - Helfer"
-
-test_that("age chart renders for selected profession and year", {
-    cleaned_df <- test_path("testdata", "23621-0008_de_flat.csv") |>
-        load_workforce_data() |>
-        clean_workforce_data()
-    prof_code <- cleaned_df |>
-        filter(profession_label == profession) |>
-        pull(profession_code) |>
-        unique()
-    expected <- age_distribution(cleaned_df, prof_code = prof_code, time = 2018)
-
+test_that("age chart shows FTE per age group for selected profession and year", {
     path <- system.file("app", package = "helloshiny")
     app_driver <- AppDriver$new(app_dir = path)
-    app_driver$set_inputs(profession_select = profession, age_year = "2018")
+    app_driver$set_inputs(profession_select = "Altenpflege (oS) - Helfer", age_year = "2018")
 
     age_chart <- app_driver$get_values(output = "age_chart")$output$age_chart
     expect_false(is.null(age_chart))
@@ -27,18 +16,29 @@ test_that("age chart renders for selected profession and year", {
             return {x: d.x, y: d.y};
         })()
     ")
-    expect_equal(unlist(trace$x), as.character(expected$age_group))
-    expect_equal(unlist(trace$y), expected$fte)
+
+    # known values from 23621-0008 for Altenpflege (oS) - Helfer, 2018 (FTE in thousands)
+    expect_equal(
+        unlist(trace$x),
+        c(
+            "unter 30 Jahre",
+            "30 bis unter 40 Jahre",
+            "40 bis unter 50 Jahre",
+            "50 bis unter 60 Jahre",
+            "60 Jahre und mehr"
+        )
+    )
+    expect_equal(unlist(trace$y), c(40, 43, 48, 65, 22))
     }
 )
 
 test_that("age chart waits for a year before rendering", {
     app <- shinyAppDir(system.file("app", package = "helloshiny"))
 
-    # age_year is never set, as at app startup: req() must stop the reactive silently
+    # age_year is never set: the chart must stop silently, not show an error
     testServer(app, {
-        session$setInputs(profession_select = profession)
-        expect_error(selected_age_distribution(), class = "shiny.silent.error")
+        session$setInputs(profession_select = "Altenpflege (oS) - Helfer")
+        expect_error(output$age_chart, class = "shiny.silent.error")
     })
     }
 )
@@ -46,10 +46,10 @@ test_that("age chart waits for a year before rendering", {
 test_that("age chart waits for a profession before rendering", {
     app <- shinyAppDir(system.file("app", package = "helloshiny"))
 
-    # profession_select is never set: req() must stop the reactive silently
+    # profession_select is never set: the chart must stop silently, not show an error
     testServer(app, {
         session$setInputs(age_year = "2018")
-        expect_error(selected_age_distribution(), class = "shiny.silent.error")
+        expect_error(output$age_chart, class = "shiny.silent.error")
     })
     }
 )
