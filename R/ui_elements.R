@@ -6,10 +6,7 @@
 
 panelselectinput <- function() {
 
-    cleaned_data <- load_workforce_data(
-        system.file("extdata", "23621-0008_de_flat.csv", package = "helloshiny")
-        ) |>
-        clean_workforce_data()
+    cleaned_data <- workforce_data()
 
     selectInput(
         "profession_select",
@@ -22,10 +19,7 @@ panelselectinput <- function() {
 #' @export
 #' @rdname uiElements
 panelsliderinput <- function() {
-    cleaned_data <- load_workforce_data(
-        system.file("extdata", "23621-0008_de_flat.csv", package = "helloshiny")
-        ) |>
-        clean_workforce_data()
+    cleaned_data <- workforce_data()
 
     year_min <- min(cleaned_data$year)
     year_max <- max(cleaned_data$year)
@@ -44,10 +38,7 @@ panelsliderinput <- function() {
 #' @export
 #' @rdname uiElements
 panelyearinput <- function() {
-    cleaned_data <- load_workforce_data(
-        system.file("extdata", "23621-0008_de_flat.csv", package = "helloshiny")
-        ) |>
-        clean_workforce_data()
+    cleaned_data <- workforce_data()
 
     selectInput(
         "age_year",

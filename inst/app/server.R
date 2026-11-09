@@ -4,10 +4,7 @@ library(dplyr)
 library(plotly)
 
 function(input, output, session) {
-    cleaned_data <- load_workforce_data(
-        system.file("extdata", "23621-0008_de_flat.csv", package = "helloshiny")
-        ) |>
-        clean_workforce_data()
+    cleaned_data <- workforce_data()
 
     aggregate_data <- aggregate_fte(cleaned_data)
 
