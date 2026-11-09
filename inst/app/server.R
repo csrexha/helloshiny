@@ -2,6 +2,7 @@ library(shiny)
 library(helloshiny)
 library(dplyr)
 library(plotly)
+library(DT)
 
 function(input, output, session) {
     cleaned_data <- workforce_data()
@@ -66,6 +67,15 @@ function(input, output, session) {
                 x = ~age_group,
                 y = ~fte,
                 type = "bar"
+            )
+        }
+    )
+
+    output$workforce_table <- renderDT(
+        {
+            datatable(
+                select(filtered_aggregate_fte(), year, profession_label, total_fte),
+                rownames = FALSE
             )
         }
     )
