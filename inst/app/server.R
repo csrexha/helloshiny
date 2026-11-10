@@ -79,4 +79,29 @@ function(input, output, session) {
             )
         }
     )
+
+    # summary tiles (FTE in thousands)
+    output$vb_latest <- renderText(
+        {
+            fte <- filtered_aggregate_fte()
+            last_year <- max(fte$year)
+            sprintf("%s thousand (%d)", format(sum(fte$total_fte[fte$year == last_year])), last_year)
+        }
+    )
+
+    output$vb_change <- renderText(
+        {
+            fte <- arrange(filtered_aggregate_fte(), year)
+            first <- fte$total_fte[1]
+            last <- fte$total_fte[nrow(fte)]
+            sprintf("%+.1f %% (%d to %d)", 100 * (last / first - 1), fte$year[1], fte$year[nrow(fte)])
+        }
+    )
+
+    output$vb_age <- renderText(
+        {
+            ages <- selected_age_distribution()
+            sprintf("%s (%s)", ages$age_group[which.max(ages$fte)], input$age_year)
+        }
+    )
 }

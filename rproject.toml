@@ -19,4 +19,5 @@ dependencies = [
     "DT",
     "tidyselect",
     "testthat",
+    "bslib",
 ]
