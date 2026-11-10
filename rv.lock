@@ -198,6 +198,15 @@ force_source = false
 dependencies = []
 
 [[packages]]
+name = "config"
+version = "0.3.2"
+source = { repository = "https://cloud.r-project.org/" }
+force_source = false
+dependencies = [
+    { name = "yaml", requirement = "(>= 2.1.19)" },
+]
+
+[[packages]]
 name = "cpp11"
 version = "0.5.5"
 source = { repository = "https://cloud.r-project.org/" }
@@ -537,6 +546,13 @@ dependencies = [
     { name = "cli", requirement = "(>= 3.4.0)" },
     { name = "rlang", requirement = "(>= 1.1.0)" },
 ]
+
+[[packages]]
+name = "logger"
+version = "0.4.3"
+source = { repository = "https://cloud.r-project.org/" }
+force_source = false
+dependencies = []
 
 [[packages]]
 name = "magrittr"

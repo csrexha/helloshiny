@@ -1,0 +1,10 @@
+# Settings per environment; R_CONFIG_ACTIVE picks one (default: "default").
+# Environments inherit unset values from `default`.
+#   data_path: the workforce CSV, relative to the installed package (inst/ in the repo)
+#   port:      where the app listens (read from cycle 13 on, by the Docker image)
+default:
+  data_path: extdata/23621-0008_de_flat.csv
+  port: 3838
+
+production:
+  port: 8080

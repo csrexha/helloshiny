@@ -3,8 +3,20 @@ library(helloshiny)
 library(dplyr)
 library(plotly)
 library(DT)
+library(logger)
 
 function(input, output, session) {
+    log_info("session started: token={session$token}")
+    onUnhandledError(function(err) log_error("unhandled error: {conditionMessage(err)}"))
+
+    observeEvent(
+        list(input$profession_select, input$year_range, input$age_year),
+        log_info(
+            "filters changed: profession={input$profession_select} ",
+            "years={input$year_range[1]}-{input$year_range[2]} age_year={input$age_year}"
+        )
+    )
+
     cleaned_data <- workforce_data()
 
     aggregate_data <- aggregate_fte(cleaned_data)
