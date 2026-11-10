@@ -7,3 +7,6 @@
 #' @importFrom plotly plot_ly plotlyOutput renderPlotly
 #' @importFrom readr read_delim locale
 NULL
+
+# config (in DESCRIPTION Imports) is called as config::get(): importing get() would
+# mask base::get() inside the package.
