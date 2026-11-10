@@ -93,23 +93,30 @@ function(input, output, session) {
         }
     )
 
-    # summary tiles (FTE in thousands)
+    # summary tiles (FTE in thousands), both FTE tiles read the same per-year totals
+    fte_per_year <- reactive(
+        filtered_aggregate_fte() |>
+            group_by(year) |>
+            summarise(total_fte = sum(total_fte), .groups = "drop") |>
+            arrange(year)
+    )
+
     output$vb_latest <- renderText(
         {
-            fte <- filtered_aggregate_fte()
-            last_year <- max(fte$year)
-            sprintf("%s thousand (%d)", format(sum(fte$total_fte[fte$year == last_year])), last_year)
+            totals <- fte_per_year()
+            latest <- totals[nrow(totals), ]
+            sprintf("%s thousand (%d)", format(latest$total_fte), latest$year)
         }
     )
 
     output$vb_change <- renderText(
         {
-            fte <- arrange(filtered_aggregate_fte(), year)
-            first <- fte$total_fte[1]
-            last <- fte$total_fte[nrow(fte)]
+            totals <- fte_per_year()
+            start_fte <- totals$total_fte[1]
+            end_fte <- totals$total_fte[nrow(totals)]
             # FTE is in rounded thousands, so small professions can start at 0
-            change <- if (first == 0) "n/a" else sprintf("%+.1f %%", 100 * (last / first - 1))
-            sprintf("%s (%d to %d)", change, fte$year[1], fte$year[nrow(fte)])
+            change <- if (start_fte == 0) "n/a" else sprintf("%+.1f %%", 100 * (end_fte / start_fte - 1))
+            sprintf("%s (%d to %d)", change, totals$year[1], totals$year[nrow(totals)])
         }
     )
 
