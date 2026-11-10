@@ -31,6 +31,7 @@ The cycle runs on one of two paths:
    ```
 
 3. **Red** (test path only). Write the test at the agreed seam. Its expected values are literals, never recomputed the way the code computes them. Run `scripts/run-suite.sh <filter>`. It's red when the test fails *because the feature is missing*, and you can quote the failing line. A load error or a typo isn't red. Commit `test: ...`.
+   - When the seam is the browser, hand the test to the `shinytest2-writer` subagent. Give it the behaviour, the seam, the literal expected values, the ids from the plan and the file name. Before committing, check the failing line it reports yourself.
 
 4. **Green.** Write the minimal code that makes the full suite pass. Run `scripts/run-suite.sh`, which must exit 0. Commit `feat: ...`.
    - Test path: do a **mutation check** after the commit. Break the behaviour each assertion guards (drop a column, shift a bound by one) and see every assertion fail. Then restore with `git checkout -- <file>`.
