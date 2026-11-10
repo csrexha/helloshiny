@@ -14,7 +14,8 @@ function(input, output, session) {
         log_info(
             "filters changed: profession={input$profession_select} ",
             "years={input$year_range[1]}-{input$year_range[2]} age_year={input$age_year}"
-        )
+        ),
+        ignoreInit = TRUE
     )
 
     cleaned_data <- workforce_data()
