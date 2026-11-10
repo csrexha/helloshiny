@@ -28,18 +28,21 @@ if [ "$branch" = "$(git branch --show-current 2> /dev/null)" ]; then
         echo "Warning: GitHub still reports ${sha:0:7} as the PR's head, not local HEAD ${local_head:0:7}." >&2
 fi
 
-run_ids() { gh run list --commit "$sha" --json databaseId --jq '.[].databaseId' | sort; }
+# a failed gh call (a transient API error) counts as "no runs yet" instead of
+# aborting the watch under set -e
+run_ids() { { gh run list --commit "$sha" --json databaseId --jq '.[].databaseId' || true; } | sort; }
 
-# poll every 10s; done once the same non-empty set of runs is seen 3 times in a row
+# Poll every 10s until the set of runs is non-empty and unchanged for 2 polls in a row
+# (about 20s without a new run). A workflow that registers later than that is missed.
 ids=""
-same=0
+unchanged_polls=0
 for _ in $(seq 1 30); do
     now="$(run_ids)"
     if [ -n "$now" ] && [ "$now" = "$ids" ]; then
-        same=$((same + 1))
-        [ "$same" -ge 2 ] && break
+        unchanged_polls=$((unchanged_polls + 1))
+        [ "$unchanged_polls" -ge 2 ] && break
     else
-        same=0
+        unchanged_polls=0
     fi
     ids="$now"
     sleep 10

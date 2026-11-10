@@ -47,6 +47,8 @@ The cycle runs on one of two paths:
    - Start `scripts/watch-ci.sh <pr-number>` in the background (CI takes several minutes).
    - If the `CI` run is red, read the failure the script prints, reproduce it locally, and fix it in a new commit. Then watch again.
    - If the `Claude PR review` run fails, the problem is its setup (the secret, the plan's usage limits), not the code. Report it to the user.
+   - If a run from any other workflow fails, report it to the user too.
+   - Once the review has run, read its comments (`gh pr view <pr-number> --comments`) and pass its findings on to the user. Fix only the ones they pick.
 
    Done when every run on the PR's head commit is green (or skipped).
 
@@ -56,4 +58,4 @@ The cycle runs on one of two paths:
 
 Paths are relative to this skill's folder:
 - `scripts/run-suite.sh [filter]` runs the testthat suite, or the files matching `filter`. It prints `RESULT failed=… errored=… warnings=… skipped=… passed=…` and exits 1 when anything failed or errored. A snapshot change counts as a failure plus a warning, and CLAUDE.md says what to do then.
-- `scripts/watch-ci.sh <pr-number>` waits until all workflow runs on the PR's head commit have appeared (`CI` and `Claude PR review`), watches each one, and prints one `<workflow>: <conclusion>` line per run. For each failed run it also prints the tail of the log. It exits 1 when any run neither succeeded nor was skipped.
+- `scripts/watch-ci.sh <pr-number>` waits until GitHub reports the pushed commit as the PR's head and every workflow run on it has appeared. It watches each run and prints one `<workflow>: <conclusion> (run <id> on <sha>)` line per run, plus the tail of the log for each failed run. It exits 1 when any run neither succeeded nor was skipped.
