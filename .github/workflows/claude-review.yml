@@ -1,0 +1,66 @@
+name: Claude PR review
+
+# Reviews every ready PR to main on open and on each push. Based on the official
+# anthropics/claude-code-action example (examples/pr-review-comprehensive.yml).
+# Needs the Claude GitHub app and a secret from `/install-github-app`
+# (CLAUDE_CODE_OAUTH_TOKEN or ANTHROPIC_API_KEY, whichever it created).
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+# a new push cancels the review still running for the same PR
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          track_progress: true
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
+            Review this pull request to an R package that ships a Shiny dashboard
+            (R/ holds the functions, inst/app/ the app, tests/testthat/ the
+            testthat and shinytest2 tests, rproject.toml and rv.lock the rv-managed
+            dependencies). Read the diff with `gh pr diff` and the description
+            with `gh pr view`; read any repo file you need for context.
+
+            Review on two separate axes and report them under separate headings:
+
+            ## Standards
+            Does the change follow the conventions this repo shows? Look at how
+            existing code and tests are written, and at
+            .claude/skills/tdd-cycle/SKILL.md, which documents the development
+            workflow. Flag code smells (unclear names, duplication, speculative
+            generality) as judgement calls, separate from clear violations.
+
+            ## Spec
+            Does the change do what the PR description says? Report what's
+            missing or partial, behaviour nobody asked for, and anything that
+            looks implemented but wrong. Quote the description for each finding.
+
+            Put line-specific findings in inline comments. Post one top-level
+            comment with both headings, under 400 words, ending with a one-line
+            count of findings per axis. Don't approve or request changes; only
+            comment.
+          claude_args: |
+            --model claude-sonnet-5-5
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
