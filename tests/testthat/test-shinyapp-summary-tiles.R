@@ -52,3 +52,17 @@ test_that("summary tiles follow the profession, year range and age year filters"
     expect_equal(tile_text(app_driver, "vb_change"), "+6.5 % (2015 to 2020)")
     expect_equal(tile_text(app_driver, "vb_age"), "unter 30 Jahre (2018)")
 })
+
+test_that("the change tile shows n/a when the first year of the range has 0 FTE", {
+    path <- system.file("app", package = "helloshiny")
+    app_driver <- AppDriver$new(app_dir = path)
+
+    wait_for_tile_change(app_driver, "vb_change")
+    before <- tile_text(app_driver, "vb_change")
+
+    # 0 thousand FTE in 2013, 4 thousand in 2023
+    app_driver$set_inputs(profession_select = "Heilerziehungspflege, Sonderpädagogik - Helfer")
+    wait_for_tile_change(app_driver, "vb_change", old = before)
+
+    expect_equal(tile_text(app_driver, "vb_change"), "n/a (2013 to 2023)")
+})
