@@ -1,30 +1,52 @@
 #!/usr/bin/env bash
-# Watch CI for a PR's current head commit. Right after a push the run may not be
-# registered yet (gh then reports "no checks"), so wait for it to appear first.
+# Watch every workflow run on a PR's current head commit (CI, the Claude review, ...).
+# Right after a push the runs may not be registered yet (gh then reports "no checks"),
+# and workflows register one by one, so wait until the set of runs stops growing.
 #   usage: watch-ci.sh <pr-number>
-# Prints the run's conclusion; on failure also the tail of the failed log, exit 1.
+# Prints one line per run, plus the tail of the failed log for each failed run.
+# Exits 1 when any run ends other than success or skipped (a skipped run, e.g. the
+# review on a draft PR, isn't a failure).
 set -euo pipefail
 
 pr="${1:?usage: watch-ci.sh <pr-number>}"
 sha="$(gh pr view "$pr" --json headRefOid --jq .headRefOid)"
 
-id=""
+run_ids() { gh run list --commit "$sha" --json databaseId --jq '.[].databaseId' | sort; }
+
+# poll every 10s; done once the same non-empty set of runs is seen 3 times in a row
+ids=""
+same=0
 for _ in $(seq 1 30); do
-    id="$(gh run list --commit "$sha" --limit 1 --json databaseId --jq '.[0].databaseId // empty')"
-    [ -n "$id" ] && break
+    now="$(run_ids)"
+    if [ -n "$now" ] && [ "$now" = "$ids" ]; then
+        same=$((same + 1))
+        [ "$same" -ge 2 ] && break
+    else
+        same=0
+    fi
+    ids="$now"
     sleep 10
 done
-[ -n "$id" ] || { echo "No CI run for ${sha:0:7} after 5 minutes." >&2; exit 1; }
+[ -n "$ids" ] || { echo "No CI run for ${sha:0:7} after 5 minutes." >&2; exit 1; }
 
-gh run watch "$id" --interval 30 > /dev/null 2>&1 || true
-conclusion="$(gh run view "$id" --json conclusion --jq .conclusion)"
-echo "CI run $id on ${sha:0:7}: $conclusion"
+failed=0
+for id in $ids; do
+    gh run watch "$id" --interval 30 > /dev/null 2>&1 || true
+    info="$(gh run view "$id" --json workflowName,conclusion --jq '[.workflowName, .conclusion] | @tsv')"
+    name="${info%%$'\t'*}"
+    conclusion="${info#*$'\t'}"
+    echo "$name: $conclusion (run $id on ${sha:0:7})"
 
-if [ "$conclusion" != "success" ]; then
-    # drop the job/step/timestamp columns gh prefixes to every log line
-    gh run view "$id" --log-failed |
-        sed -E 's/^[^\t]*\t[^\t]*\t[0-9TZ:.-]+ //' |
-        grep -v -E '^(chr|dbl|lgl|int) |^Delimiter|^Rows:' |
-        tail -60
-    exit 1
-fi
+    case "$conclusion" in
+        success | skipped) ;;
+        *)
+            failed=1
+            # drop the job/step/timestamp columns gh prefixes to every log line
+            gh run view "$id" --log-failed |
+                sed -E 's/^[^\t]*\t[^\t]*\t[0-9TZ:.-]+ //' |
+                grep -v -E '^(chr|dbl|lgl|int) |^Delimiter|^Rows:' |
+                tail -60
+            ;;
+    esac
+done
+exit "$failed"
