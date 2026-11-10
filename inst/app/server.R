@@ -107,7 +107,9 @@ function(input, output, session) {
             fte <- arrange(filtered_aggregate_fte(), year)
             first <- fte$total_fte[1]
             last <- fte$total_fte[nrow(fte)]
-            sprintf("%+.1f %% (%d to %d)", 100 * (last / first - 1), fte$year[1], fte$year[nrow(fte)])
+            # FTE is in rounded thousands, so small professions can start at 0
+            change <- if (first == 0) "n/a" else sprintf("%+.1f %%", 100 * (last / first - 1))
+            sprintf("%s (%d to %d)", change, fte$year[1], fte$year[nrow(fte)])
         }
     )
 
