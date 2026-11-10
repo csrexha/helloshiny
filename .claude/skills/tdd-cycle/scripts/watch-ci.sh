@@ -65,6 +65,7 @@ for _ in $(seq 1 90); do
         for id in $pending; do
             gh run watch "$id" --interval 30 > /dev/null 2>&1
         done
+        sleep 10 # keeps the loop paced when gh run watch fails at once
         previous=""
         unchanged_polls=0
         continue
