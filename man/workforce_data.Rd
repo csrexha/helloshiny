@@ -10,6 +10,7 @@ workforce_data()
 A data frame, as returned by \code{\link[=clean_workforce_data]{clean_workforce_data()}}
 }
 \description{
-Loads and cleans \code{inst/extdata/23621-0008_de_flat.csv} on first use and
-caches the result for the rest of the R session.
+Loads and cleans the CSV named by \code{data_path} in \code{inst/config/config.yml}
+(for the environment in \code{R_CONFIG_ACTIVE}) on first use, and caches the result
+for the rest of the R session.
 }

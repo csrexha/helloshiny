@@ -13,9 +13,12 @@ Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Imports: 
+    bslib,
+    config,
     dplyr,
     DT,
     ggplot2,
+    logger,
     plotly,
     readr,
     shiny

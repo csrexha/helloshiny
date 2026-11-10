@@ -3,8 +3,21 @@ library(helloshiny)
 library(dplyr)
 library(plotly)
 library(DT)
+library(logger)
 
 function(input, output, session) {
+    log_info("session started: token={session$token}")
+    onUnhandledError(function(err) log_error("unhandled error: {conditionMessage(err)}"))
+
+    observeEvent(
+        list(input$profession_select, input$year_range, input$age_year),
+        log_info(
+            "filters changed: profession={input$profession_select} ",
+            "years={input$year_range[1]}-{input$year_range[2]} age_year={input$age_year}"
+        ),
+        ignoreInit = TRUE
+    )
+
     cleaned_data <- workforce_data()
 
     aggregate_data <- aggregate_fte(cleaned_data)
@@ -77,6 +90,40 @@ function(input, output, session) {
                 select(filtered_aggregate_fte(), year, profession_label, total_fte),
                 rownames = FALSE
             )
+        }
+    )
+
+    # summary tiles (FTE in thousands), both FTE tiles read the same per-year totals
+    fte_per_year <- reactive(
+        filtered_aggregate_fte() |>
+            group_by(year) |>
+            summarise(total_fte = sum(total_fte), .groups = "drop") |>
+            arrange(year)
+    )
+
+    output$vb_latest <- renderText(
+        {
+            totals <- fte_per_year()
+            latest <- totals[nrow(totals), ]
+            sprintf("%s thousand (%d)", format(latest$total_fte), latest$year)
+        }
+    )
+
+    output$vb_change <- renderText(
+        {
+            totals <- fte_per_year()
+            start_fte <- totals$total_fte[1]
+            end_fte <- totals$total_fte[nrow(totals)]
+            # FTE is in rounded thousands, so small professions can start at 0
+            change <- if (start_fte == 0) "n/a" else sprintf("%+.1f %%", 100 * (end_fte / start_fte - 1))
+            sprintf("%s (%d to %d)", change, totals$year[1], totals$year[nrow(totals)])
+        }
+    )
+
+    output$vb_age <- renderText(
+        {
+            ages <- selected_age_distribution()
+            sprintf("%s (%s)", ages$age_group[which.max(ages$fte)], input$age_year)
         }
     )
 }
