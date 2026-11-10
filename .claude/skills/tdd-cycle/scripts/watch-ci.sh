@@ -9,7 +9,24 @@
 set -euo pipefail
 
 pr="${1:?usage: watch-ci.sh <pr-number>}"
-sha="$(gh pr view "$pr" --json headRefOid --jq .headRefOid)"
+pr_head() { gh pr view "$pr" --json headRefName,headRefOid --jq '[.headRefName, .headRefOid] | @tsv'; }
+
+# Right after a push GitHub can still report the PR's previous head commit, whose runs
+# are long finished. When run on the PR's branch, wait until GitHub has the local HEAD.
+info="$(pr_head)"
+branch="${info%%$'\t'*}"
+sha="${info#*$'\t'}"
+if [ "$branch" = "$(git branch --show-current 2> /dev/null)" ]; then
+    local_head="$(git rev-parse HEAD)"
+    for _ in $(seq 1 12); do
+        [ "$sha" = "$local_head" ] && break
+        sleep 10
+        info="$(pr_head)"
+        sha="${info#*$'\t'}"
+    done
+    [ "$sha" = "$local_head" ] ||
+        echo "Warning: GitHub still reports ${sha:0:7} as the PR's head, not local HEAD ${local_head:0:7}." >&2
+fi
 
 run_ids() { gh run list --commit "$sha" --json databaseId --jq '.[].databaseId' | sort; }
 
