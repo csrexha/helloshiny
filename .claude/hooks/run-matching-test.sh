@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
-# PostToolUse hook (Write|Edit): after an edit to R/<name>.R, run its testthat file.
+# PostToolUse hook (Write|Edit): after an edit to package or app code, run its tests.
 #   R/<name>.R      -> tests/testthat/test-<name>.R
 #   R/ui_elements.R -> all tests/testthat/test-shinyapp-*.R (browser tests, slower)
+#   inst/app/*.R    -> all tests/testthat/test-shinyapp-*.R
 #   anything else   -> nothing
+# The whole-app snapshot (test-shinytest2.R) is left to the full suite: any app
+# change alters it, and accepting a new snapshot is the user's call.
 # On failure, exits 2 so the test output is fed back to Claude.
 set -euo pipefail
 
@@ -12,20 +15,22 @@ file="$(jq -r '.tool_input.file_path // .tool_response.filePath // empty')"
 
 rel="${file#"$root"/}"
 case "$rel" in
-    R/*.R | R/*.r) ;;
+    inst/app/*.[rR])
+        filter="^shinyapp"
+        ;;
+    R/*.[rR])
+        stem="$(basename "$rel")"
+        stem="${stem%.*}"
+        if compgen -G "$root/tests/testthat/test-$stem.[rR]" > /dev/null; then
+            filter="^$stem\$"
+        elif [ "$stem" = "ui_elements" ]; then
+            filter="^shinyapp"
+        else
+            exit 0
+        fi
+        ;;
     *) exit 0 ;;
 esac
-
-stem="$(basename "$rel")"
-stem="${stem%.*}"
-
-if compgen -G "$root/tests/testthat/test-$stem.[rR]" > /dev/null; then
-    filter="^$stem\$"
-elif [ "$stem" = "ui_elements" ]; then
-    filter="^shinyapp"
-else
-    exit 0
-fi
 
 cd "$root"
 if ! out="$(NOT_CRAN=true rv run -e "
