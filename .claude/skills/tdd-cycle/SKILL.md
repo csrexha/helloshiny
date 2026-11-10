@@ -45,9 +45,12 @@ The cycle runs on one of two paths:
    - Push with `git push -u origin <branch>`.
    - Write the body (`pr` skill) to a scratchpad file with the Write tool, then run `gh pr create --body-file <file>`. A heredoc body is part of the Bash command, and the git guardrail hook blocks it when the text mentions a push to main or a hard reset.
    - Start `scripts/watch-ci.sh <pr-number>` in the background (CI takes several minutes).
-   - Red CI: read the failure it prints, reproduce it locally, and fix it in a new commit. Then watch again.
+   - If the `CI` run is red, read the failure the script prints, reproduce it locally, and fix it in a new commit. Then watch again.
+   - If the `Claude PR review` run fails, the problem is its setup (the secret, the plan's usage limits), not the code. Report it to the user.
+   - If a run from any other workflow fails, report it to the user too.
+   - Once the review has run, read its comments (`gh pr view <pr-number> --comments`) and pass its findings on to the user. Fix only the ones they pick.
 
-   Done when CI is green.
+   Done when every run on the PR's head commit is green (or skipped).
 
 8. **build_plan.md.** Once CI is green, mark the cycle ✅ and strike through its bullets. Rewrite the Test and Green lines to say what was actually built. The file is gitignored, so there's no commit. Report the PR URL, the commits and the CI result.
 
@@ -55,4 +58,4 @@ The cycle runs on one of two paths:
 
 Paths are relative to this skill's folder:
 - `scripts/run-suite.sh [filter]` runs the testthat suite, or the files matching `filter`. It prints `RESULT failed=… errored=… warnings=… skipped=… passed=…` and exits 1 when anything failed or errored. A snapshot change counts as a failure plus a warning, and CLAUDE.md says what to do then.
-- `scripts/watch-ci.sh <pr-number>` waits for the run on the PR's head commit to appear, watches it, and prints its conclusion. On failure, it also prints the tail of the failed log and exits 1.
+- `scripts/watch-ci.sh <pr-number>` waits until GitHub reports the pushed commit as the PR's head, then watches the latest run of each workflow on it until all are finished and no new run has appeared for about 20s. Superseded runs don't count. It prints one `<workflow>: <conclusion> (run <id> on <sha>)` line per workflow, plus the tail of the log for each failed run. It exits 1 when a run neither succeeded nor was skipped, when no run appears within 15 minutes, or when GitHub never reports the pushed commit.
