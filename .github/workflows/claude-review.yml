@@ -61,6 +61,8 @@ jobs:
             comment with both headings, under 400 words, ending with a one-line
             count of findings per axis. Don't approve or request changes; only
             comment.
+          # Read/Glob/Grep: the brief asks it to read repo conventions and SKILL.md;
+          # without them it reviewed the diff alone (PR #20: "I can't read .github/workflows")
           claude_args: |
             --model claude-sonnet-5-5
-            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
+            --allowedTools "Read,Glob,Grep,mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
