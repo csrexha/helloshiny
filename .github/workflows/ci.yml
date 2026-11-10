@@ -9,6 +9,11 @@ on:
 permissions:
   contents: read
 
+# A new push to a PR cancels that PR's run still in progress; runs on main always finish.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -21,6 +26,7 @@ jobs:
           r-version: '4.6'
 
       - name: Cache rv library
+        id: rv-cache
         uses: actions/cache@v4
         with:
           path: rv/library
@@ -32,13 +38,15 @@ jobs:
           curl -sSL https://raw.githubusercontent.com/A2-ai/rv/refs/heads/main/scripts/install.sh | bash
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
+      # Headers for compiling CRAN source packages: only needed when the rv cache
+      # missed. Chrome for shinytest2 ships with the runner image.
       - name: Install system dependencies
+        if: steps.rv-cache.outputs.cache-hit != 'true'
         run: |
           sudo apt-get update && sudo apt-get install -y \
             libuv1-dev \
             libcurl4-openssl-dev \
-            libssl-dev \
-            chromium-browser
+            libssl-dev
 
       - name: Install dependencies
         run: rv sync
@@ -47,3 +55,4 @@ jobs:
         run: rv run -e "pkgload::load_all(); shinytest2::test_app(reporter = 'progress')"
         env:
           NOT_CRAN: "true"
+          CHROMOTE_CHROME: /usr/bin/google-chrome
